@@ -1,4 +1,4 @@
-= Teashop
+= Tea shop
 
 image:https://img.shields.io/badge/vert.x-3.6.3-purple.svg[link="https://vertx.io"]
 
