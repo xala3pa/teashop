@@ -40,22 +40,32 @@
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-core</artifactId>
-      <version>${vertx.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-core</artifactId>
-      <version>${vertx.version}</version>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-web</artifactId>
-      <version>${vertx.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-web-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-jdbc-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.2.3</version>
+    </dependency>
+    <dependency>
+      <groupId>org.hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+      <version>2.3.4</version>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-junit5</artifactId>
-      <version>${vertx.version}</version>
       <scope>test</scope>
     </dependency>
 
@@ -135,6 +145,12 @@
         <version>${exec-maven-plugin.version}</version>
         <configuration>
           <mainClass>io.vertx.core.Launcher</mainClass>
+          <systemProperties>
+            <systemProperty>
+              <key>hsqldb.reconfig_logging</key>
+              <value>false</value>
+            </systemProperty>
+          </systemProperties>
           <arguments>
             <argument>run</argument>
             <argument>${main.verticle}</argument>
