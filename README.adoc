@@ -18,7 +18,7 @@ To package your application:
 
 To run your application:
 ```
-./mvnw clean exec:java
+./mvnw exec:java
 ```
 
 == Help
