@@ -29,7 +29,7 @@ public class TestMainVerticle {
     vertx.createHttpClient().getNow(8080, "localhost", "/", response -> testContext.verify(() -> {
       assertEquals(200, response.statusCode());
       response.handler(body -> {
-        assertTrue(body.toString().contains("Hello from Vert.x!"));
+        assertTrue(body.toString().contains("Simple Teashop made with &#x2764 and Vert.x"));
         testContext.completeNow();
       });
     }));
