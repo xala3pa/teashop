@@ -5,6 +5,7 @@ import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.jdbc.JDBCClient;
 import io.vertx.ext.sql.SQLConnection;
+import io.vertx.serviceproxy.ServiceBinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +18,7 @@ public class TeaDatabaseVerticle extends AbstractVerticle {
   private static final String CONFIG_TEADB_JDBC_DRIVER_CLASS = "teadb.jdbc.driver_class";
   private static final String CONFIG_TEADB_JDBC_MAX_POOL_SIZE = "teadb.jdbc.max_pool_size";
   private static final String SQL_CREATE_PAGES_TABLE = "CREATE TABLE IF NOT EXISTS TEA (ID INTEGER, NAME VARCHAR(25), TYPE VARCHAR(25),INFUSE_TIME VARCHAR(25))";
+  private static final String CONFIG_TEADB_QUEUE = "teadb.queue";
 
   @Override
   public void start(Future<Void> startFuture) throws Exception {
@@ -24,6 +26,16 @@ public class TeaDatabaseVerticle extends AbstractVerticle {
       .put("url", config().getString(CONFIG_TEADB_JDBC_URL, "jdbc:hsqldb:file:db/teashop"))
       .put("driver_class", config().getString(CONFIG_TEADB_JDBC_DRIVER_CLASS, "org.hsqldb.jdbcDriver"))
       .put("max_pool_size", config().getInteger(CONFIG_TEADB_JDBC_MAX_POOL_SIZE, 30)));
+
+    TeaDatabaseService.createTeaDatabaseService(dbClient, ready -> {
+      if (ready.succeeded()) {
+        ServiceBinder binder = new ServiceBinder(vertx);
+        binder.setAddress(CONFIG_TEADB_QUEUE).register(TeaDatabaseService.class, ready.result());
+        startFuture.complete();
+      } else {
+        startFuture.fail(ready.cause());
+      }
+    });
 
     dbClient.getConnection(ar -> {
       if (ar.failed()) {
