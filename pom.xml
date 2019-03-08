@@ -106,6 +106,7 @@
             <source>1.8</source>
             <target>1.8</target>
             <annotationProcessors>
+              <annotationProcessor>lombok.launch.AnnotationProcessorHider$AnnotationProcessor</annotationProcessor>
               <annotationProcessor>io.vertx.codegen.CodeGenProcessor</annotationProcessor>
             </annotationProcessors>
             <generatedSourcesDirectory>${project.basedir}/src/main/generated</generatedSourcesDirectory>

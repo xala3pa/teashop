@@ -17,6 +17,7 @@ public class Tea {
   private Integer ID;
   private String name;
   private TeaType teaType;
+  private Integer infuse_time;
 
   // Mandatory for data objects
   public Tea(JsonObject jsonObject) {

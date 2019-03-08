@@ -15,19 +15,26 @@ public class TeaDatabaseServiceImpl implements TeaDatabaseService {
 
   private final JDBCClient dbClient;
 
-  TeaDatabaseServiceImpl(JDBCClient dbClient, Handler<AsyncResult<TeaDatabaseService>> readyHandler) {
+  TeaDatabaseServiceImpl(JDBCClient dbClient) {
     this.dbClient = dbClient;
   }
 
   @Override
   public TeaDatabaseService addTea(Tea tea, Handler<AsyncResult<Void>> resultHandler) {
-    String sql = "INSERT INTO TEA (id, name, type, infusion_time) VALUES ?, ?, ?, ?";
+    String sql = "INSERT INTO TEA (id, name, type, infuse_time) VALUES ?, ?, ?, ?";
 
-    dbClient.updateWithParams(sql, new JsonArray().add(tea.toJson()), res -> {
+    JsonArray data = new JsonArray().
+      add(tea.getID()).
+      add(tea.getName()).
+      add(tea.getTeaType()).
+      add(tea.getInfuse_time());
+
+    dbClient.updateWithParams(sql, data, res -> {
       if (res.succeeded()) {
+        LOGGER.info("TeaDatabaseServiceImpl :: addTea - Adding new tea: {}",tea);
         resultHandler.handle(Future.succeededFuture());
       } else {
-        LOGGER.error("Database Error: Inserting new Tea", res.cause());
+        LOGGER.error("TeaDatabaseServiceImpl :: addTea - Database Error: Inserting new Tea", res.cause());
         resultHandler.handle(Future.failedFuture(res.cause()));
       }
     });

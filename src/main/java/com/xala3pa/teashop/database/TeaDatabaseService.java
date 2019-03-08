@@ -13,8 +13,8 @@ import io.vertx.ext.jdbc.JDBCClient;
 public interface TeaDatabaseService {
 
   @GenIgnore
-  static TeaDatabaseService createTeaDatabaseService(JDBCClient dbClient, Handler<AsyncResult<TeaDatabaseService>> readyHandler) {
-    return new TeaDatabaseServiceImpl(dbClient, readyHandler);
+  static TeaDatabaseService createTeaDatabaseService(JDBCClient dbClient) {
+    return new TeaDatabaseServiceImpl(dbClient);
   }
 
   @GenIgnore
