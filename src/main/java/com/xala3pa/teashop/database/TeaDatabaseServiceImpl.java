@@ -20,7 +20,7 @@ public class TeaDatabaseServiceImpl implements TeaDatabaseService {
   }
 
   @Override
-  public TeaDatabaseService addTea(Tea tea, Handler<AsyncResult<Void>> resultHandler) {
+  public TeaDatabaseService addTea(Tea tea, Handler<AsyncResult<Tea>> resultHandler) {
     String sql = "INSERT INTO TEA (id, name, type, infuse_time) VALUES ?, ?, ?, ?";
 
     JsonArray data = new JsonArray().
@@ -32,7 +32,7 @@ public class TeaDatabaseServiceImpl implements TeaDatabaseService {
     dbClient.updateWithParams(sql, data, res -> {
       if (res.succeeded()) {
         LOGGER.info("TeaDatabaseServiceImpl :: addTea - Adding new tea: {}",tea);
-        resultHandler.handle(Future.succeededFuture());
+        resultHandler.handle(Future.succeededFuture(tea));
       } else {
         LOGGER.error("TeaDatabaseServiceImpl :: addTea - Database Error: Inserting new Tea", res.cause());
         resultHandler.handle(Future.failedFuture(res.cause()));

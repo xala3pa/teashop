@@ -43,7 +43,7 @@ public class TeaDatabaseVerticle extends AbstractVerticle {
             LOGGER.error("TeaDatabaseVerticle :: Database preparation error", create.cause());
             startFuture.fail(create.cause());
           } else {
-            LOGGER.info("TeaDatabaseVerticle :: Initialization Database done");
+            LOGGER.info("TeaDatabaseVerticle :: 2Initialization Database done");
             startFuture.complete();
           }
         });

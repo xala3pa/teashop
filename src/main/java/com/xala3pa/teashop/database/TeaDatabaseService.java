@@ -23,5 +23,5 @@ public interface TeaDatabaseService {
   }
 
   @Fluent
-  TeaDatabaseService addTea(Tea tea, Handler<AsyncResult<Void>> resultHandler);
+  TeaDatabaseService addTea(Tea tea, Handler<AsyncResult<Tea>> resultHandler);
 }

@@ -2,7 +2,6 @@ package com.xala3pa.teashop.http;
 
 import com.xala3pa.teashop.database.TeaDatabaseService;
 import com.xala3pa.teashop.domain.Tea;
-import com.xala3pa.teashop.domain.TeaType;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -55,30 +54,26 @@ public class HttpServerVerticle extends AbstractVerticle {
   private void addTeaHandler(RoutingContext routingContext) {
     HttpServerResponse response = routingContext.response();
 
-    Tea tea = Tea.builder().
-      ID(1).
-      name("Pai Mu Tan").
-      teaType(TeaType.WHITE_TEA).
-      infuse_time(3).
-      build();
-
-    Handler<AsyncResult<Void>> handler = reply -> {
+    Handler<AsyncResult<Tea>> handler = reply -> {
       if (reply.succeeded()) {
-        try {
-          //final Tea tea = Json.decodeValue(routingContext.getBodyAsString(), Tea.class);
+          Tea tea = reply.result();
           String responseBody = Json.encodePrettily(tea.toJson());
           LOGGER.info("HttpServerVerticle :: New Tea added");
           sendSuccess(responseBody, response, CREATED);
-        } catch (DecodeException ex) {
-          LOGGER.error("HttpServerVerticle :: Error adding a new tea - ex: {}", ex.getCause());
-          sendError(BAD_REQUEST, response);
-        }
       } else {
         LOGGER.error("HttpServerVerticle :: Error in the replay", reply.cause());
         routingContext.fail(reply.cause());
       }
     };
-    teaDatabaseService.addTea(tea, handler);
+
+    try {
+      final Tea tea = Json.decodeValue(routingContext.getBodyAsString(), Tea.class);
+      teaDatabaseService.addTea(tea, handler);
+    } catch (DecodeException ex) {
+      LOGGER.error("HttpServerVerticle :: Error adding a new tea - ex: {}", ex.getStackTrace());
+      sendError(BAD_REQUEST, response);
+    }
+
   }
 
   private void indexHandler(RoutingContext routingContext) {
