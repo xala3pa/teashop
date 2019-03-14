@@ -7,6 +7,7 @@ import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonArray;
 import io.vertx.ext.jdbc.JDBCClient;
 
 @ProxyGen
@@ -24,4 +25,7 @@ public interface TeaDatabaseService {
 
   @Fluent
   TeaDatabaseService addTea(Tea tea, Handler<AsyncResult<Tea>> resultHandler);
+
+  @Fluent
+  TeaDatabaseService findAllTeas(Handler<AsyncResult<JsonArray>> resultHandler);
 }

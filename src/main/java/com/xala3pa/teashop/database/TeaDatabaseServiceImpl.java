@@ -9,9 +9,12 @@ import io.vertx.ext.jdbc.JDBCClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.stream.Collectors;
+
 
 public class TeaDatabaseServiceImpl implements TeaDatabaseService {
   private static final Logger LOGGER = LoggerFactory.getLogger(TeaDatabaseServiceImpl.class);
+  private static final int TEA_NAME = 1;
 
   private final JDBCClient dbClient;
 
@@ -35,6 +38,28 @@ public class TeaDatabaseServiceImpl implements TeaDatabaseService {
         resultHandler.handle(Future.succeededFuture(tea));
       } else {
         LOGGER.error("TeaDatabaseServiceImpl :: addTea - Database Error: Inserting new Tea", res.cause());
+        resultHandler.handle(Future.failedFuture(res.cause()));
+      }
+    });
+    return this;
+  }
+
+  @Override
+  public TeaDatabaseService findAllTeas(Handler<AsyncResult<JsonArray>> resultHandler) {
+    String sql = "SELECT * FROM TEA";
+
+    dbClient.query(sql, res -> {
+      if (res.succeeded()) {
+        JsonArray teas = new JsonArray(res.result()
+          .getResults()
+          .stream()
+          .map(json -> json.getString(TEA_NAME))
+          .sorted()
+          .collect(Collectors.toList()));
+        LOGGER.info("TeaDatabaseServiceImpl :: findAllTeas - Getting list of all teas");
+        resultHandler.handle(Future.succeededFuture(teas));
+      } else {
+        LOGGER.error("TeaDatabaseServiceImpl :: findAllTeas - Database Error: Getting all Teas", res.cause());
         resultHandler.handle(Future.failedFuture(res.cause()));
       }
     });
