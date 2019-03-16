@@ -1,6 +1,8 @@
 package com.xala3pa.teashop.database;
 
 import com.xala3pa.teashop.domain.Tea;
+import com.xala3pa.teashop.domain.TeaType;
+import com.xala3pa.teashop.domain.exceptions.TeaNotFoundException;
 import io.vertx.codegen.annotations.Fluent;
 import io.vertx.codegen.annotations.GenIgnore;
 import io.vertx.codegen.annotations.ProxyGen;
@@ -28,4 +30,7 @@ public interface TeaDatabaseService {
 
   @Fluent
   TeaDatabaseService findAllTeas(Handler<AsyncResult<JsonArray>> resultHandler);
+
+  @Fluent
+  TeaDatabaseService findTeasByType(TeaType teatype, Handler<AsyncResult<JsonArray>> handler);
 }

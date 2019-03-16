@@ -2,8 +2,10 @@ package com.xala3pa.teashop.http;
 
 import com.xala3pa.teashop.database.TeaDatabaseService;
 import com.xala3pa.teashop.domain.Tea;
+import com.xala3pa.teashop.domain.TeaType;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.Json;
@@ -16,6 +18,7 @@ public class TeaController {
   private static final int CREATED = 201;
   private static final int BAD_REQUEST = 400;
   private static final int OK = 200;
+  private static final int NOT_FOUND = 404;
 
   private TeaDatabaseService teaDatabaseService;
 
@@ -41,6 +44,7 @@ public class TeaController {
     Handler<AsyncResult<JsonArray>> handler = reply -> {
       if (reply.succeeded()) {
         String responseBody = Json.encodePrettily(reply.result());
+        LOGGER.info("HttpServerVerticle :: findAllTeas - Getting all Teas");
         sendSuccess(responseBody, response, OK);
       } else {
         LOGGER.error("HttpServerVerticle :: findAllTeas - Error in the replay", reply.cause());
@@ -76,6 +80,36 @@ public class TeaController {
   }
 
   void findTeasByType(RoutingContext routingContext) {
+    LOGGER.info("HttpServerVerticle :: findTeasByType - Getting teas by type router call");
+    HttpServerResponse response = routingContext.response();
+    HttpServerRequest request = routingContext.request();
+
+    Handler<AsyncResult<JsonArray>> handler = reply -> {
+      if (reply.succeeded()) {
+        String responseBody = Json.encodePrettily(reply.result());
+        LOGGER.info("HttpServerVerticle :: findTeasByType - Getting teas by type");
+        sendSuccess(responseBody, response, OK);
+      } else {
+        LOGGER.error("HttpServerVerticle :: findTeasByType - Error in the replay", reply.cause());
+        routingContext.fail(reply.cause());
+      }
+    };
+
+    String type = request.getParam("type");
+    if (type == null) {
+      LOGGER.error("HttpServerVerticle :: findTeasByType - Bad Request data");
+      sendError(BAD_REQUEST, response);
+    } else {
+      TeaType teaType;
+      try {
+        teaType = TeaType.valueOf(type);
+        LOGGER.info("HttpServerVerticle :: findTeasByType - Tea type: {}", teaType);
+        teaDatabaseService.findTeasByType(teaType, handler);
+      } catch (IllegalArgumentException ex) {
+        LOGGER.error("HttpServerVerticle :: findTeasByType - Illegal Argument Exception: {}", ex.getCause());
+        sendError(BAD_REQUEST, response);
+      }
+    }
   }
 
   void findTeaById(RoutingContext routingContext) {
