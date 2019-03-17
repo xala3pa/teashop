@@ -1,6 +1,5 @@
 package com.xala3pa.teashop.database;
 
-import com.xala3pa.teashop.domain.Tea;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
@@ -42,9 +41,11 @@ public class TeaDatabaseVerticle extends AbstractVerticle {
           if (create.failed()) {
             LOGGER.error("TeaDatabaseVerticle :: Database preparation error", create.cause());
             startFuture.fail(create.cause());
+            connection.close();
           } else {
             LOGGER.info("TeaDatabaseVerticle :: Initialization Database done");
             startFuture.complete();
+            connection.close();
           }
         });
       }

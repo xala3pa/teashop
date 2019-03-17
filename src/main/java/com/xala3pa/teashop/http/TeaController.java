@@ -10,6 +10,7 @@ import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +81,6 @@ public class TeaController {
   }
 
   void findTeasByType(RoutingContext routingContext) {
-    LOGGER.info("HttpServerVerticle :: findTeasByType - Getting teas by type router call");
     HttpServerResponse response = routingContext.response();
     HttpServerRequest request = routingContext.request();
 
@@ -90,8 +90,8 @@ public class TeaController {
         LOGGER.info("HttpServerVerticle :: findTeasByType - Getting teas by type");
         sendSuccess(responseBody, response, OK);
       } else {
-        LOGGER.error("HttpServerVerticle :: findTeasByType - Error in the replay", reply.cause());
-        routingContext.fail(reply.cause());
+        LOGGER.error("HttpServerVerticle :: findTeasByType - Error in the reply", reply.cause());
+        sendError(NOT_FOUND, response);
       }
     };
 
@@ -106,13 +106,35 @@ public class TeaController {
         LOGGER.info("HttpServerVerticle :: findTeasByType - Tea type: {}", teaType);
         teaDatabaseService.findTeasByType(teaType, handler);
       } catch (IllegalArgumentException ex) {
-        LOGGER.error("HttpServerVerticle :: findTeasByType - Illegal Argument Exception: {}", ex.getCause());
+        LOGGER.error("HttpServerVerticle :: findTeasByType - Illegal Argument Exception: {}", type);
         sendError(BAD_REQUEST, response);
       }
     }
   }
 
-  void findTeaById(RoutingContext routingContext) {
+  void findTeaByID(RoutingContext routingContext) {
+    HttpServerResponse response = routingContext.response();
+    HttpServerRequest request = routingContext.request();
+
+    Handler<AsyncResult<JsonObject>> handler = reply -> {
+      if (reply.succeeded()) {
+        String responseBody = Json.encodePrettily(reply.result());
+        LOGGER.info("HttpServerVerticle :: findTeaByID - Getting teas by ID");
+        sendSuccess(responseBody, response, OK);
+      } else {
+        LOGGER.error("HttpServerVerticle :: findTeaByID - Error in the reply", reply.cause());
+        sendError(NOT_FOUND, response);
+      }
+    };
+
+    String teaID = request.getParam("id");
+    if (teaID == null) {
+      LOGGER.error("HttpServerVerticle :: findTeaByID - Bad Request data");
+      sendError(BAD_REQUEST, response);
+    } else {
+      LOGGER.info("HttpServerVerticle :: findTeaByID - Tea ID: {}", teaID);
+      teaDatabaseService.findTeasByID(teaID, handler);
+    }
   }
 
   void updateTeaByID(RoutingContext routingContext) {

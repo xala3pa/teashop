@@ -42,7 +42,7 @@ public class HttpServerVerticle extends AbstractVerticle {
     router.get("/").handler(teaController::indexHandler);
     router.get("/teas").handler(teaController::findAllTeas);
     router.get("/teas/type/:type").handler(teaController::findTeasByType);
-    router.get("/teas/:id").handler(teaController::findTeaById);
+    router.get("/teas/:id").handler(teaController::findTeaByID);
     router.put("/teas/:id").handler(teaController::updateTeaByID);
     router.post("/teas").handler(teaController::addTea);
     router.delete("/teas/:id").handler(teaController::deleteTea);

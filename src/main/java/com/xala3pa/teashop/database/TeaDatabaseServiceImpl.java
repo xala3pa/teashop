@@ -7,6 +7,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.jdbc.JDBCClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,6 +92,29 @@ public class TeaDatabaseServiceImpl implements TeaDatabaseService {
         }
       } else {
         LOGGER.error("TeaDatabaseServiceImpl :: findTeasByType - Database Error: Getting teas by type", res.cause());
+        resultHandler.handle(Future.failedFuture(res.cause()));
+      }
+    });
+    return this;
+  }
+
+  @Override
+  public TeaDatabaseService findTeasByID(String teaID, Handler<AsyncResult<JsonObject>> resultHandler) {
+    String sql = "SELECT * FROM TEA WHERE ID = ?";
+
+    JsonArray data = new JsonArray().add(teaID);
+
+    dbClient.queryWithParams(sql, data, res -> {
+      if (res.succeeded()) {
+        if (res.result().getResults().isEmpty()) {
+          LOGGER.error("TeaDatabaseServiceImpl :: findTeasByID - No results", res.cause());
+          resultHandler.handle(Future.failedFuture(new TeaNotFoundException("No Teas found by ID : " + teaID)));
+        } else {
+          LOGGER.info("TeaDatabaseServiceImpl :: findTeasByID - Getting Tea by ID");
+          resultHandler.handle(Future.succeededFuture(res.result().getRows().get(0)));
+        }
+      } else {
+        LOGGER.error("TeaDatabaseServiceImpl :: findTeasByID - Database Error: Getting Tea by ID", res.cause());
         resultHandler.handle(Future.failedFuture(res.cause()));
       }
     });
