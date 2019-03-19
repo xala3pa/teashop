@@ -120,4 +120,22 @@ public class TeaDatabaseServiceImpl implements TeaDatabaseService {
     });
     return this;
   }
+
+  @Override
+  public TeaDatabaseService deleteTeaByID(String teaID, Handler<AsyncResult<Void>> resultHandler) {
+    String sql = "DELETE FROM TEA WHERE ID = ?";
+
+    JsonArray data = new JsonArray().add(teaID);
+
+    dbClient.updateWithParams(sql, data, res -> {
+      if (res.succeeded()) {
+        LOGGER.info("TeaDatabaseServiceImpl :: deleteTeaByID - Deleting tea by ID: {}", teaID);
+        resultHandler.handle(Future.succeededFuture());
+      } else {
+        LOGGER.error("TeaDatabaseServiceImpl :: deleteTeaByID - Database Error: Deleting Tea by ID", res.cause());
+        resultHandler.handle(Future.failedFuture(res.cause()));
+      }
+    });
+    return this;
+  }
 }

@@ -20,6 +20,7 @@ public class TeaController {
   private static final int BAD_REQUEST = 400;
   private static final int OK = 200;
   private static final int NOT_FOUND = 404;
+  private static final int NOT_CONTENT = 204;
 
   private TeaDatabaseService teaDatabaseService;
 
@@ -141,6 +142,28 @@ public class TeaController {
   }
 
   void deleteTea(RoutingContext routingContext) {
+    HttpServerResponse response = routingContext.response();
+    HttpServerRequest request = routingContext.request();
+
+    Handler<AsyncResult<Void>> handler = reply -> {
+      if (reply.succeeded()) {
+        String responseBody = Json.encodePrettily(reply.result());
+        LOGGER.info("HttpServerVerticle :: deleteTea - Deleting tea by ID");
+        sendSuccess(responseBody, response, NOT_CONTENT);
+      } else {
+        LOGGER.error("HttpServerVerticle :: deleteTea - Error in the reply", reply.cause());
+        sendError(NOT_FOUND, response);
+      }
+    };
+
+    String teaID = request.getParam("id");
+    if (teaID == null) {
+      LOGGER.error("HttpServerVerticle :: deleteTea - Bad Request data");
+      sendError(BAD_REQUEST, response);
+    } else {
+      LOGGER.info("HttpServerVerticle :: deleteTea - Tea ID: {}", teaID);
+      teaDatabaseService.deleteTeaByID(teaID, handler);
+    }
   }
 
   private void sendError(int statusCode, HttpServerResponse response) {

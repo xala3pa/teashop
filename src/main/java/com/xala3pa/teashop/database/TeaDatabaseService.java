@@ -38,4 +38,7 @@ public interface TeaDatabaseService {
 
   @Fluent
   TeaDatabaseService findTeasByID(String teaID, Handler<AsyncResult<JsonObject>> handler);
+
+  @Fluent
+  TeaDatabaseService deleteTeaByID(String teaID, Handler<AsyncResult<Void>> handler);
 }
