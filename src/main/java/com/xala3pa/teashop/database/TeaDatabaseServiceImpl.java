@@ -138,4 +138,41 @@ public class TeaDatabaseServiceImpl implements TeaDatabaseService {
     });
     return this;
   }
+
+  @Override
+  public TeaDatabaseService updateTea(Tea tea, Handler<AsyncResult<Tea>> resultHandler) {
+    String updateSql = "UPDATE TEA SET NAME=?, TYPE=?, INFUSE_TIME=? WHERE ID = ?";
+    String findSql = "SELECT * FROM TEA WHERE ID = ?";
+
+    JsonArray findData = new JsonArray().add(tea.getID());
+
+    dbClient.queryWithParams(findSql, findData, res -> {
+      if (res.succeeded()) {
+        if (res.result().getResults().isEmpty()) {
+          LOGGER.error("TeaDatabaseServiceImpl :: updateTea - No results", res.cause());
+          resultHandler.handle(Future.failedFuture(new TeaNotFoundException("No Teas found by ID : " + tea.getID())));
+        } else {
+          JsonArray updateData = new JsonArray()
+            .add(tea.getName())
+            .add(tea.getTeaType())
+            .add(tea.getInfuse_time())
+            .add(tea.getID());
+
+          dbClient.updateWithParams(updateSql, updateData, result -> {
+            if (result.succeeded()) {
+              LOGGER.info("TeaDatabaseServiceImpl :: updateTea - Updating tea with ID: {}", tea.getID());
+              resultHandler.handle(Future.succeededFuture(tea));
+            } else {
+              LOGGER.error("TeaDatabaseServiceImpl :: updateTea - Database Error: Updating Tea", result.cause());
+              resultHandler.handle(Future.failedFuture(result.cause()));
+            }
+          });
+        }
+      } else {
+        LOGGER.error("TeaDatabaseServiceImpl :: updateTea - Database Error: Getting Tea by ID", res.cause());
+        resultHandler.handle(Future.failedFuture(res.cause()));
+      }
+    });
+    return this;
+  }
 }

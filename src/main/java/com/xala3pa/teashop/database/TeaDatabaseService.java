@@ -34,11 +34,14 @@ public interface TeaDatabaseService {
   TeaDatabaseService findAllTeas(Handler<AsyncResult<JsonArray>> resultHandler);
 
   @Fluent
-  TeaDatabaseService findTeasByType(TeaType teatype, Handler<AsyncResult<JsonArray>> handler);
+  TeaDatabaseService findTeasByType(TeaType teatype, Handler<AsyncResult<JsonArray>> resultHandler);
 
   @Fluent
-  TeaDatabaseService findTeasByID(String teaID, Handler<AsyncResult<JsonObject>> handler);
+  TeaDatabaseService findTeasByID(String teaID, Handler<AsyncResult<JsonObject>> resultHandler);
 
   @Fluent
-  TeaDatabaseService deleteTeaByID(String teaID, Handler<AsyncResult<Void>> handler);
+  TeaDatabaseService deleteTeaByID(String teaID, Handler<AsyncResult<Void>> resultHandler);
+
+  @Fluent
+  TeaDatabaseService updateTea(Tea tea, Handler<AsyncResult<Tea>> resultHandler);
 }

@@ -138,7 +138,27 @@ public class TeaController {
     }
   }
 
-  void updateTeaByID(RoutingContext routingContext) {
+  void updateTea(RoutingContext routingContext) {
+    HttpServerResponse response = routingContext.response();
+
+    Handler<AsyncResult<Tea>> handler = reply -> {
+      if (reply.succeeded()) {
+        String responseBody = Json.encodePrettily(reply.result());
+        LOGGER.info("HttpServerVerticle :: updateTea - Tea updated");
+        sendSuccess(responseBody, response, OK);
+      } else {
+        LOGGER.error("HttpServerVerticle :: updateTea - Error in the replay", reply.cause());
+        routingContext.fail(reply.cause());
+      }
+    };
+
+    try {
+      final Tea tea = Json.decodeValue(routingContext.getBodyAsString(), Tea.class);
+      teaDatabaseService.updateTea(tea, handler);
+    } catch (DecodeException ex) {
+      LOGGER.error("HttpServerVerticle :: updateTea - Error Updating tea with ID: {}", ex.getCause());
+      sendError(BAD_REQUEST, response);
+    }
   }
 
   void deleteTea(RoutingContext routingContext) {
